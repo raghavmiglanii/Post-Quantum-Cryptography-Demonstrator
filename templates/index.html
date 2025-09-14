@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Quantum Cryptography Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: #7f8c8d;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #34495e;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            word-break: break-all;
+            color: #495057;
+        }
+
+        .metrics-section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .metrics-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .metric-card h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-success {
+            background-color: #27ae60;
+        }
+
+        .status-warning {
+            background-color: #f39c12;
+        }
+
+        .status-error {
+            background-color: #e74c3c;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #27ae60;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border-color: #e74c3c;
+            color: #721c24;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Post-Quantum Cryptography Demo</h1>
+            <p>Demonstrating CRYSTALS-Kyber and CRYSTALS-Dilithium algorithms with performance monitoring and resource constraints simulation</p>
+        </div>
+
+        <!-- System Status -->
+        <div class="metrics-section">
+            <h2>System Status</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>PQC Library</h3>
+                    <div class="metric-value">
+                        <span class="status-indicator {% if system_info.liboqs_available %}status-success{% else %}status-warning{% endif %}"></span>
+                        {% if system_info.liboqs_available %}Available{% else %}Simulated{% endif %}
+                    </div>
+                    <div class="metric-label">liboqs Status</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Memory Usage</h3>
+                    <div class="metric-value">{{ "%.1f"|format(performance_metrics.memory_mb) }} MB</div>
+                    <div class="metric-label">Current / {{ performance_metrics.max_memory_mb }} MB Limit</div>
+                </div>
+                <div class="metric-card">
+                    <h3>CPU Usage</h3>
+                    <div class="metric-value">{{ "%.1f"|format(performance_metrics.cpu_percent) }}%</div>
+                    <div class="metric-label">Current / {{ performance_metrics.max_cpu_percent }}% Limit</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Platform</h3>
+                    <div class="metric-value">{{ system_info.platform }}</div>
+                    <div class="metric-label">Python {{ system_info.python_version }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Kyber Section -->
+            <div class="card">
+                <h2>CRYSTALS-Kyber (Key Encapsulation)</h2>
+                
+                <div class="form-group">
+                    <button class="btn" onclick="generateKyberKeys()">Generate Keypair</button>
+                    <button class="btn btn-secondary" onclick="clearKyberData()">Clear Data</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="kyber-public-key">Public Key:</label>
+                    <textarea id="kyber-public-key" rows="3" placeholder="Generated public key will appear here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="kyber-private-key">Private Key:</label>
+                    <textarea id="kyber-private-key" rows="3" placeholder="Generated private key will appear here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-success" onclick="kyberEncapsulate()">Encapsulate Secret</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="kyber-ciphertext">Ciphertext:</label>
+                    <textarea id="kyber-ciphertext" rows="3" placeholder="Encapsulated ciphertext will appear here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="kyber-shared-secret">Shared Secret:</label>
+                    <textarea id="kyber-shared-secret" rows="3" placeholder="Shared secret will appear here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-success" onclick="kyberDecapsulate()">Decapsulate Secret</button>
+                </div>
+
+                <div id="kyber-result" class="result-box" style="display: none;"></div>
+            </div>
+
+            <!-- Dilithium Section -->
+            <div class="card">
+                <h2>CRYSTALS-Dilithium (Digital Signatures)</h2>
+                
+                <div class="form-group">
+                    <button class="btn" onclick="generateDilithiumKeys()">Generate Keypair</button>
+                    <button class="btn btn-secondary" onclick="clearDilithiumData()">Clear Data</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="dilithium-public-key">Public Key:</label>
+                    <textarea id="dilithium-public-key" rows="3" placeholder="Generated public key will appear here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="dilithium-private-key">Private Key:</label>
+                    <textarea id="dilithium-private-key" rows="3" placeholder="Generated private key will appear here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="dilithium-message">Message to Sign:</label>
+                    <input type="text" id="dilithium-message" placeholder="Enter message to sign...">
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-success" onclick="dilithiumSign()">Sign Message</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="dilithium-signature">Signature:</label>
+                    <textarea id="dilithium-signature" rows="3" placeholder="Generated signature will appear here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-success" onclick="dilithiumVerify()">Verify Signature</button>
+                </div>
+
+                <div id="dilithium-result" class="result-box" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="metrics-section">
+            <h2>Performance Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>Kyber Key Generation</h3>
+                    <div class="metric-value">{{ "%.2f"|format(performance_metrics.get('kyber_keygen_time', 0)) }} ms</div>
+                    <div class="metric-label">Average Time</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Kyber Encapsulation</h3>
+                    <div class="metric-value">{{ "%.2f"|format(performance_metrics.get('kyber_encaps_time', 0)) }} ms</div>
+                    <div class="metric-label">Average Time</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Dilithium Key Generation</h3>
+                    <div class="metric-value">{{ "%.2f"|format(performance_metrics.get('dilithium_keygen_time', 0)) }} ms</div>
+                    <div class="metric-label">Average Time</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Dilithium Signing</h3>
+                    <div class="metric-value">{{ "%.2f"|format(performance_metrics.get('dilithium_sign_time', 0)) }} ms</div>
+                    <div class="metric-label">Average Time</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables to store keys
+        let currentKyberKeys = {};
+        let currentDilithiumKeys = {};
+
+        // Utility functions
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.header'));
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        function updateResult(elementId, data, executionTime) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.innerHTML = `Execution Time: ${executionTime} ms\n\n${JSON.stringify(data, null, 2)}`;
+        }
+
+        // Kyber Functions
+        async function generateKyberKeys() {
+            showLoading();
+            try {
+                const response = await fetch('/api/kyber/keygen', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentKyberKeys = data.result;
+                    document.getElementById('kyber-public-key').value = data.result.public_key;
+                    document.getElementById('kyber-private-key').value = data.result.private_key;
+                    updateResult('kyber-result', data.result, data.execution_time_ms);
+                    showAlert(`Kyber keypair generated successfully! (${data.execution_time_ms} ms)`, 'success');
+                } else {
+                    showAlert(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Network error: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function kyberEncapsulate() {
+            const publicKey = document.getElementById('kyber-public-key').value;
+            if (!publicKey) {
+                showAlert('Please generate a keypair first', 'error');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch('/api/kyber/encaps', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ public_key: publicKey })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('kyber-ciphertext').value = data.result.ciphertext;
+                    document.getElementById('kyber-shared-secret').value = data.result.shared_secret;
+                    updateResult('kyber-result', data.result, data.execution_time_ms);
+                    showAlert(`Encapsulation successful! (${data.execution_time_ms} ms)`, 'success');
+                } else {
+                    showAlert(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Network error: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function kyberDecapsulate() {
+            const privateKey = document.getElementById('kyber-private-key').value;
+            const ciphertext = document.getElementById('kyber-ciphertext').value;
+            
+            if (!privateKey || !ciphertext) {
+                showAlert('Please provide both private key and ciphertext', 'error');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch('/api/kyber/decap', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        private_key: privateKey,
+                        ciphertext: ciphertext 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('kyber-shared-secret').value = data.result.shared_secret;
+                    updateResult('kyber-result', data.result, data.execution_time_ms);
+                    showAlert(`Decapsulation successful! (${data.execution_time_ms} ms)`, 'success');
+                } else {
+                    showAlert(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Network error: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function clearKyberData() {
+            document.getElementById('kyber-public-key').value = '';
+            document.getElementById('kyber-private-key').value = '';
+            document.getElementById('kyber-ciphertext').value = '';
+            document.getElementById('kyber-shared-secret').value = '';
+            document.getElementById('kyber-result').style.display = 'none';
+            currentKyberKeys = {};
+            showAlert('Kyber data cleared', 'success');
+        }
+
+        // Dilithium Functions
+        async function generateDilithiumKeys() {
+            showLoading();
+            try {
+                const response = await fetch('/api/dilithium/keygen', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentDilithiumKeys = data.result;
+                    document.getElementById('dilithium-public-key').value = data.result.public_key;
+                    document.getElementById('dilithium-private-key').value = data.result.private_key;
+                    updateResult('dilithium-result', data.result, data.execution_time_ms);
+                    showAlert(`Dilithium keypair generated successfully! (${data.execution_time_ms} ms)`, 'success');
+                } else {
+                    showAlert(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Network error: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function dilithiumSign() {
+            const privateKey = document.getElementById('dilithium-private-key').value;
+            const message = document.getElementById('dilithium-message').value;
+            
+            if (!privateKey || !message) {
+                showAlert('Please generate a keypair and enter a message', 'error');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch('/api/dilithium/sign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        private_key: privateKey,
+                        message: message 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('dilithium-signature').value = data.result.signature;
+                    updateResult('dilithium-result', data.result, data.execution_time_ms);
+                    showAlert(`Message signed successfully! (${data.execution_time_ms} ms)`, 'success');
+                } else {
+                    showAlert(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Network error: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function dilithiumVerify() {
+            const publicKey = document.getElementById('dilithium-public-key').value;
+            const message = document.getElementById('dilithium-message').value;
+            const signature = document.getElementById('dilithium-signature').value;
+            
+            if (!publicKey || !message || !signature) {
+                showAlert('Please provide public key, message, and signature', 'error');
+                return;
+            }
+
+            showLoading();
+            try {
+                const response = await fetch('/api/dilithium/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        public_key: publicKey,
+                        message: message,
+                        signature: signature 
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateResult('dilithium-result', data.result, data.execution_time_ms);
+                    const status = data.result.is_valid ? 'VALID' : 'INVALID';
+                    showAlert(`Signature verification: ${status}! (${data.execution_time_ms} ms)`, 
+                             data.result.is_valid ? 'success' : 'error');
+                } else {
+                    showAlert(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Network error: ${error.message}`, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function clearDilithiumData() {
+            document.getElementById('dilithium-public-key').value = '';
+            document.getElementById('dilithium-private-key').value = '';
+            document.getElementById('dilithium-message').value = '';
+            document.getElementById('dilithium-signature').value = '';
+            document.getElementById('dilithium-result').style.display = 'none';
+            currentDilithiumKeys = {};
+            showAlert('Dilithium data cleared', 'success');
+        }
+
+        // Auto-refresh metrics every 5 seconds
+        setInterval(async () => {
+            try {
+                const response = await fetch('/api/metrics');
+                const data = await response.json();
+                if (data.success) {
+                    // Update performance metrics display
+                    const metrics = data.metrics;
+                    // You can add real-time metric updates here if needed
+                }
+            } catch (error) {
+                console.log('Failed to refresh metrics:', error);
+            }
+        }, 5000);
+    </script>
+</body>
+</html> 
